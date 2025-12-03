@@ -8,8 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ★关键：引入腾讯云开发 SDK -->
-    <script src="https://imgcache.qq.com/qcloud/tcbjs/1.10.0/tcb.js"></script>
+    <!-- 引入leancloud开发 SDK -->
+    <script src="//code.bdstatic.com/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
 
     <style>
         :root {
@@ -336,98 +336,90 @@
     </div>
 
     <script>
-        // ★★★ 这里是您需要修改的配置 ★★★
-        const YOUR_ENV_ID = "填写您的环境ID"; // 比如: "env-123456"
+    // ★★★ 请在这里填入 LeanCloud 的 Key ★★★
+    const APP_ID = "IMzNgHjwht6N0LGHej9c9Rrb-MdYXbMMI";  // 刚才复制的 App ID
+    const APP_KEY = "bLaVj1wNy2M1VzqnqbqDmi3p"; // 刚才复制的 App Key
+    // serverURL 填: https://你的AppID前8位.api.lncldglobal.com
+    // 例如 AppID 是 "abcdefg...", 则填 "https://abcdefg.api.lncldglobal.com"
+    const SERVER_URL = "https://IMzNgHjw.api.lncldglobal.com"; 
+
+    // 初始化 LeanCloud
+    AV.init({
+        appId: APP_ID,
+        appKey: APP_KEY,
+        serverURLs: SERVER_URL
+    });
+
+    // Modal Logic (保持不变)
+    const modal = document.getElementById('rsvpModal');
+    const openBtn = document.getElementById('openModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const form = document.getElementById('rsvpForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const openModal = () => {
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('div').classList.remove('scale-95'); modal.querySelector('div').classList.add('scale-100'); }, 10);
+    };
+    const closeModal = () => {
+        modal.classList.add('opacity-0'); modal.querySelector('div').classList.remove('scale-100'); modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    };
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // Handle Submit (修改为 LeanCloud 逻辑)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        let app = null;
-        let auth = null;
-
-        // 初始化 TCB
-        try {
-            app = tcb.init({
-                env: YOUR_ENV_ID
-            });
-            
-            auth = app.auth();
-
-            // 匿名登录 (必须在控制台开启“匿名登录”)
-            auth.signInAnonymously().then(() => {
-                console.log("TCB Anonymous Login Success");
-            }).catch(err => {
-                console.error("Login Failed:", err);
-            });
-
-        } catch (e) {
-            console.error("TCB Init Error:", e);
+        if (APP_ID === "你的_App_ID") {
+            alert("请先在代码中填入 LeanCloud 的 App ID 和 Key！");
+            return;
         }
 
-        // Modal Logic
-        const modal = document.getElementById('rsvpModal');
-        const openBtn = document.getElementById('openModalBtn');
-        const closeBtn = document.getElementById('closeModalBtn');
-        const form = document.getElementById('rsvpForm');
-        const submitBtn = document.getElementById('submitBtn');
+        const name = document.getElementById('name').value;
+        const identity = document.getElementById('identity').value;
+        const contact = document.getElementById('contact').value;
+        const wishes = document.getElementById('wishes').value;
 
-        const openModal = () => {
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('div').classList.remove('scale-95'); modal.querySelector('div').classList.add('scale-100'); }, 10);
-        };
-        const closeModal = () => {
-            modal.classList.add('opacity-0'); modal.querySelector('div').classList.remove('scale-100'); modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        };
+        // Loading state
+        const originalBtnContent = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "提交中... / Загрузка...";
 
-        openBtn.addEventListener('click', openModal);
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-        // Handle Submit
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        try {
+            // 定义数据库表名 'RSVP'
+            const RSVP = AV.Object.extend('RSVP');
+            const rsvp = new RSVP();
             
-            // 简单的未配置检查
-            if (YOUR_ENV_ID === "cloud1-2gvntokf4de163f6") {
-                alert("请先在 HTML 代码中填入您的腾讯云开发环境 ID (Env ID)！");
-                return;
-            }
+            // 保存数据
+            rsvp.set('name', name);
+            rsvp.set('identity', identity);
+            rsvp.set('contact', contact);
+            rsvp.set('wishes', wishes);
+            
+            await rsvp.save();
 
-            const name = document.getElementById('name').value;
-            const identity = document.getElementById('identity').value;
-            const contact = document.getElementById('contact').value;
-            const wishes = document.getElementById('wishes').value;
+            // 成功反馈
+            submitBtn.innerHTML = "提交成功! / Успешно!";
+            submitBtn.style.background = "#4ade80"; 
+            setTimeout(() => {
+                closeModal();
+                openBtn.innerHTML = '<span class="font-bold text-lg">已预留席位</span><span class="text-sm ru-font">До встречи!</span>';
+                openBtn.disabled = true;
+                openBtn.style.background = "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)";
+                openBtn.classList.remove('rsvp-btn'); // 移除旧样式以保持绿色
+            }, 1000);
 
-            // Loading state
-            const originalBtnContent = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = "提交中... / Загрузка...";
-
-            try {
-                // 调用云函数
-                const res = await app.callFunction({
-                    name: 'submit_rsvp',
-                    data: { name, identity, contact, wishes }
-                });
-
-                if (res.result && res.result.code === 200) {
-                    submitBtn.innerHTML = "提交成功! / Успешно!";
-                    submitBtn.style.background = "#4ade80"; 
-                    setTimeout(() => {
-                        closeModal();
-                        openBtn.innerHTML = '<span class="font-bold text-lg">期待您的到来</span><span class="text-sm ru-font">До встречи!</span>';
-                        openBtn.disabled = true;
-                        openBtn.style.background = "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)";
-                    }, 1000);
-                } else {
-                    throw new Error(res.result ? res.result.msg : "Unknown Error");
-                }
-            } catch (error) {
-                console.error("Submission error: ", error);
-                alert("提交失败，请重试。\n错误信息: " + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnContent;
-            }
-        });
+        } catch (error) {
+            console.error("Submission error: ", error);
+            alert("提交失败，请重试。\n错误信息: " + error.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnContent;
+        }
+    });
     </script>
 </body>
-
 </html>
