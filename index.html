@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025俄文系新年晚会邀请函</title>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ★关键：引入腾讯云开发 SDK -->
+    <script src="https://imgcache.qq.com/qcloud/tcbjs/1.10.0/tcb.js"></script>
+
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --accent-gold: #D4AF37;
+            --deep-blue: #1B315E; 
+            --glass-bg: rgba(27, 49, 94, 0.45); 
+            --glass-border: rgba(255, 215, 0, 0.2);
+            --input-bg: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background-color: var(--deep-blue);
+            background-image: 
+                radial-gradient(circle at 50% -20%, rgba(255, 223, 0, 0.15) 0%, transparent 60%),
+                linear-gradient(180deg, #203A6F 0%, #111e38 100%);
+            color: white;
+            font-family: 'Noto Serif SC', serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* 氛围光斑 */
+        .bokeh {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: float 20s infinite ease-in-out;
+        }
+        .bokeh:nth-child(1) { width: 300px; height: 300px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%); animation-delay: 0s; }
+        .bokeh:nth-child(2) { width: 350px; height: 350px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.04) 0%, transparent 70%); animation-delay: -10s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10px, -10px); }
+        }
+
+        /* 雪花动画 */
+        .snowflake {
+            color: #fff;
+            font-size: 1em;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+            position: fixed;
+            top: -10%;
+            z-index: 1;
+            user-select: none;
+            cursor: default;
+            animation-name: snowflakes-fall, snowflakes-shake;
+            animation-duration: 15s, 5s;
+            animation-timing-function: linear, ease-in-out;
+            animation-iteration-count: infinite, infinite;
+            animation-play-state: running, running;
+            opacity: 0.5;
+        }
+        @keyframes snowflakes-fall { 0% { top: -10%; } 100% { top: 100%; } }
+        @keyframes snowflakes-shake { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(80px); } }
+        /* 生成一些雪花 */
+        .snowflake:nth-of-type(0) { left: 1%; animation-delay: 0s, 0s; }
+        .snowflake:nth-of-type(1) { left: 10%; animation-delay: 1s, 1s; }
+        .snowflake:nth-of-type(2) { left: 20%; animation-delay: 6s, .5s; }
+        .snowflake:nth-of-type(3) { left: 30%; animation-delay: 4s, 2s; }
+        .snowflake:nth-of-type(4) { left: 40%; animation-delay: 2s, 2s; }
+        .snowflake:nth-of-type(5) { left: 50%; animation-delay: 8s, 3s; }
+        .snowflake:nth-of-type(6) { left: 60%; animation-delay: 6s, 2s; }
+        .snowflake:nth-of-type(7) { left: 70%; animation-delay: 2.5s, 1s; }
+        .snowflake:nth-of-type(8) { left: 80%; animation-delay: 1s, 0s; }
+        .snowflake:nth-of-type(9) { left: 90%; animation-delay: 3s, 1.5s; }
+
+        /* 升级版玻璃卡片 */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .corner-decor {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border: 1px solid var(--primary-gold);
+            z-index: 1;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .corner-tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; border-radius: 4px 0 0 0; }
+        .corner-tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; border-radius: 0 4px 0 0; }
+        .corner-bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; border-radius: 0 0 0 4px; }
+        .corner-br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; border-radius: 0 0 4px 0; }
+
+        .gold-text-shimmer {
+            background: linear-gradient(
+                to right,
+                #bf953f 0%,
+                #fffacd 20%, 
+                #b38728 40%,
+                #fffacd 60%,
+                #aa771c 80%,
+                #bf953f 100%
+            );
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 6s linear infinite;
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .gold-text { color: var(--primary-gold); }
+        .ru-font { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; }
+        .ornament-line { display: flex; align-items: center; justify-content: center; margin: 24px 0; }
+        .ornament-line::before, .ornament-line::after {
+            content: ""; height: 1px; background: linear-gradient(90deg, transparent, var(--primary-gold), transparent); flex: 1; margin: 0 15px; opacity: 0.5;
+        }
+
+        .rsvp-btn {
+            background: linear-gradient(135deg, #E5C568 0%, #D4AF37 50%, #C5A028 100%);
+            color: #0F172A;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .rsvp-btn:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        .rsvp-btn:disabled { opacity: 0.7; cursor: not-allowed; filter: grayscale(50%); }
+
+        .fade-in-up { animation: fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.3s; }
+        .delay-300 { animation-delay: 0.5s; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        
+        .dome-icon {
+            fill: none; stroke: var(--primary-gold); stroke-width: 1.5; stroke-dasharray: 300; stroke-dashoffset: 300;
+            animation: drawDome 2s ease-out forwards; filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.4));
+        }
+        @keyframes drawDome { to { stroke-dashoffset: 0; } }
+        .icon-gold { stroke: var(--primary-gold); width: 28px; height: 28px; min-width: 28px; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)); }
+
+        /* Modal specific styles */
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px); }
+        .form-input {
+            background: var(--input-bg); border: 1px solid rgba(255, 255, 255, 0.2); color: white; transition: all 0.3s;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-gold); background: rgba(0, 0, 0, 0.5); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        .form-select option { background-color: #0F172A; color: white; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4">
+
+    <div class="bokeh"></div>
+    <div class="bokeh"></div>
+
+    <div class="snowflakes" aria-hidden="true">
+        <div class="snowflake">❅</div><div class="snowflake">❆</div><div class="snowflake">❅</div>
+        <div class="snowflake">❆</div><div class="snowflake">❅</div><div class="snowflake">❆</div>
+        <div class="snowflake">❅</div><div class="snowflake">❆</div><div class="snowflake">❅</div>
+        <div class="snowflake">❆</div>
+    </div>
+
+    <main class="w-full max-w-xl relative z-10 my-10">
+        <div class="glass-card rounded-xl p-6 md:p-10 text-center fade-in-up">
+            <!-- 装饰元素 -->
+            <div class="corner-decor corner-tl"></div><div class="corner-decor corner-tr"></div>
+            <div class="corner-decor corner-bl"></div><div class="corner-decor corner-br"></div>
+
+            <div class="w-24 h-24 mx-auto mb-4 relative z-10">
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <path class="dome-icon" d="M50 5 C50 5 25 35 25 55 C25 75 35 85 50 85 C65 85 75 75 75 55 C75 35 50 5 50 5 Z M50 5 V 85 M25 55 H 75 M35 40 H 65" />
+                    <circle cx="50" cy="15" r="2" fill="#D4AF37" class="opacity-0 animate-[fadeIn_0.5s_ease-out_1.5s_forwards]" />
+                </svg>
+            </div>
+
+            <h2 class="ru-font text-2xl md:text-3xl text-gray-200 mb-2 tracking-wide fade-in-up delay-100 drop-shadow-md">
+                С Новым годом
+            </h2>
+            <h1 class="text-6xl md:text-7xl font-bold gold-text-shimmer mb-2 fade-in-up delay-100" style="font-family: 'Playfair Display', serif;">
+                2025
+            </h1>
+            <h3 class="text-xl md:text-2xl font-bold tracking-widest mb-1 fade-in-up delay-200 text-white drop-shadow-sm">
+                俄文系新年晚会
+            </h3>
+            <p class="ru-font text-lg text-[var(--accent-gold)] opacity-90 mb-6 fade-in-up delay-200">
+                Новогодний вечер
+            </p>
+
+            <div class="ornament-line fade-in-up delay-200"><span class="text-2xl text-[var(--primary-gold)] opacity-80">❅</span></div>
+
+            <div class="space-y-6 text-gray-200 text-sm md:text-base leading-relaxed mb-8 px-2 fade-in-up delay-200 relative z-10">
+                <div class="text-center space-y-1">
+                    <p class="font-bold">尊敬的老师、亲爱的同学：</p>
+                    <p class="ru-font text-sm text-gray-300">Уважаемые преподаватели и студенты!</p>
+                </div>
+                
+                <div class="text-justify space-y-4">
+                    <p>
+                        辞旧迎新之际，我们诚挚地邀请您拨冗出席2025年俄文系新年晚会。
+                        <br>
+                        <span class="ru-font text-sm text-gray-400 block mt-1">Приглашаем вас присоединиться к нам на праздновании Нового года 2025.</span>
+                    </p>
+                    
+                    <div class="relative py-4 my-4 bg-white/5 rounded-lg border border-white/5 shadow-inner">
+                        <span class="absolute -top-3 -left-1 text-5xl text-[var(--primary-gold)] opacity-30 font-serif leading-none">“</span>
+                        <div class="text-center space-y-2 px-4">
+                            <p class="ru-font text-lg text-[var(--primary-gold)] italic leading-relaxed drop-shadow-sm">
+                                Друзья мои, прекрасен наш союз!<br>Он, как душа, неразделим и вечен.
+                            </p>
+                            <p class="text-sm text-gray-300 font-serif">
+                                朋友们，我们的情谊多么美好！<br>它像灵魂不可分割，于世长存。
+                            </p>
+                            <p class="text-xs text-gray-400 mt-2 text-right mr-4">— А.С. Пушкин (普希金)</p>
+                        </div>
+                        <span class="absolute -bottom-6 -right-1 text-5xl text-[var(--primary-gold)] opacity-30 font-serif leading-none">”</span>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="text-white opacity-90">愿我们在这不朽的联结中，共赴2025的新约。</p>
+                        <p class="ru-font text-sm text-gray-400 mt-1">Пусть в этом нерушимом союзе мы вместе встретим 2025 год.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-black/30 rounded-xl p-6 mb-8 text-left space-y-6 border border-white/10 fade-in-up delay-300 shadow-lg relative z-10">
+                <!-- Info Section -->
+                <div class="flex items-center gap-4">
+                    <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <div class="flex-1">
+                        <p class="text-sm text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Дата</p>
+                        <p class="font-bold text-lg leading-tight text-white">2025年12月12日 (周五)</p>
+                        <p class="text-sm text-gray-400 ru-font mt-0.5">12 декабря 2025 (Пятница)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <div class="flex-1">
+                        <p class="text-sm text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Время</p>
+                        <p class="font-bold text-lg leading-tight text-white">18:00 入场 | 18:30 开始</p>
+                        <p class="text-sm text-gray-400 ru-font mt-0.5">Вход с 18:00, начало в 18:30</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Место</p>
+                        <p class="font-bold text-lg leading-tight text-white">复旦大学南区工会 北109 靳以剧场</p>
+                        <p class="text-[11px] sm:text-sm text-gray-400 ru-font mt-0.5 whitespace-nowrap overflow-x-auto no-scrollbar">
+                            Южный кампус, Профсоюз, Север 109, Театр Цзинь И
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button id="openModalBtn" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10">
+                <span class="font-bold text-lg tracking-widest text-[#0A1128]">预留您的席位</span>
+                <span class="text-sm font-normal ru-font text-[#0A1128]/80 group-hover:opacity-100 transition-opacity">Забронировать место</span>
+            </button>
+        </div>
+        
+        <footer class="mt-8 text-center text-xs text-gray-500 fade-in-up delay-300 flex flex-col items-center gap-1">
+            <p>© 2025 复旦大学白桦俄语社</p>
+            <div class="flex items-center justify-center gap-2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zM12 21v-9" /><path d="M12 12l4-4" /><path d="M12 12l-4-4" /></svg>
+                <p class="ru-font text-xs">Клуб русского языка "Берёзка"</p>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Modal 弹窗 -->
+    <div id="rsvpModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
+        <div class="glass-card w-11/12 max-w-md p-6 rounded-xl transform scale-95 transition-transform duration-300 relative text-left">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold text-[var(--primary-gold)] mb-1">出席确认</h3>
+            <p class="text-xs text-gray-400 ru-font mb-6">Подтверждение участия</p>
+            
+            <form id="rsvpForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">姓名 / ФИО <span class="text-red-500">*</span></label>
+                    <input type="text" id="name" required class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入您的姓名">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">身份 / Статус <span class="text-red-500">*</span></label>
+                    <select id="identity" class="form-input w-full px-4 py-2 rounded-lg form-select">
+                        <option value="student">本科生 / Бакалавр</option>
+                        <option value="grad_student">研究生 / Магистр/Аспирант</option>
+                        <option value="teacher">教师 / Преподаватель</option>
+                        <option value="guest">校友或嘉宾 / Гость</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">微信号或手机 / Контакты <span class="text-red-500">*</span></label>
+                    <input type="text" id="contact" required class="form-input w-full px-4 py-2 rounded-lg" placeholder="用于接收通知">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">新年寄语 / Пожелания (选填)</label>
+                    <textarea id="wishes" rows="2" class="form-input w-full px-4 py-2 rounded-lg" placeholder="想听的歌，或想说的话..."></textarea>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" id="submitBtn" class="rsvp-btn w-full py-3 rounded-lg font-bold text-[#0A1128] transition-all">提交 / Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ★★★ 这里是您需要修改的配置 ★★★
+        const YOUR_ENV_ID = "填写您的环境ID"; // 比如: "env-123456"
+        
+        let app = null;
+        let auth = null;
+
+        // 初始化 TCB
+        try {
+            app = tcb.init({
+                env: YOUR_ENV_ID
+            });
+            
+            auth = app.auth();
+
+            // 匿名登录 (必须在控制台开启“匿名登录”)
+            auth.signInAnonymously().then(() => {
+                console.log("TCB Anonymous Login Success");
+            }).catch(err => {
+                console.error("Login Failed:", err);
+            });
+
+        } catch (e) {
+            console.error("TCB Init Error:", e);
+        }
+
+        // Modal Logic
+        const modal = document.getElementById('rsvpModal');
+        const openBtn = document.getElementById('openModalBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const form = document.getElementById('rsvpForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const openModal = () => {
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('div').classList.remove('scale-95'); modal.querySelector('div').classList.add('scale-100'); }, 10);
+        };
+        const closeModal = () => {
+            modal.classList.add('opacity-0'); modal.querySelector('div').classList.remove('scale-100'); modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        };
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // Handle Submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 简单的未配置检查
+            if (YOUR_ENV_ID === "cloud1-2gvntokf4de163f6") {
+                alert("请先在 HTML 代码中填入您的腾讯云开发环境 ID (Env ID)！");
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            const identity = document.getElementById('identity').value;
+            const contact = document.getElementById('contact').value;
+            const wishes = document.getElementById('wishes').value;
+
+            // Loading state
+            const originalBtnContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "提交中... / Загрузка...";
+
+            try {
+                // 调用云函数
+                const res = await app.callFunction({
+                    name: 'submit_rsvp',
+                    data: { name, identity, contact, wishes }
+                });
+
+                if (res.result && res.result.code === 200) {
+                    submitBtn.innerHTML = "提交成功! / Успешно!";
+                    submitBtn.style.background = "#4ade80"; 
+                    setTimeout(() => {
+                        closeModal();
+                        openBtn.innerHTML = '<span class="font-bold text-lg">期待您的到来</span><span class="text-sm ru-font">До встречи!</span>';
+                        openBtn.disabled = true;
+                        openBtn.style.background = "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)";
+                    }, 1000);
+                } else {
+                    throw new Error(res.result ? res.result.msg : "Unknown Error");
+                }
+            } catch (error) {
+                console.error("Submission error: ", error);
+                alert("提交失败，请重试。\n错误信息: " + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnContent;
+            }
+        });
+    </script>
+</body>
+</html>
