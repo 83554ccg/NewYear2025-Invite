@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025俄文系新年晚会邀请函</title>
-    <!-- 引入 Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入leancloud开发 SDK -->
-    <script src="//code.bdstatic.com/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
+    <script src="https://code.bdstatic.com/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
 
     <style>
         :root {
@@ -192,7 +189,6 @@
 
     <main class="w-full max-w-xl relative z-10 my-10">
         <div class="glass-card rounded-xl p-6 md:p-10 text-center fade-in-up">
-            <!-- 装饰元素 -->
             <div class="corner-decor corner-tl"></div><div class="corner-decor corner-tr"></div>
             <div class="corner-decor corner-bl"></div><div class="corner-decor corner-br"></div>
 
@@ -224,11 +220,13 @@
                     <p class="ru-font text-sm text-gray-300">Уважаемые преподаватели и студенты!</p>
                 </div>
                 
-                <div class="text-justify space-y-4">
-                    <p>
+                <div class="text-center space-y-4">
+                    <p style="text-wrap: balance; word-break: keep-all;">
                         辞旧迎新之际，我们诚挚地邀请您拨冗出席2025年俄文系新年晚会。
                         <br>
-                        <span class="ru-font text-sm text-gray-400 block mt-1">В преддверии праздника сердечно приглашаем Вас на наш Новогодний вечер.</span>
+                        <span class="ru-font text-sm text-gray-400 block mt-1" style="text-wrap: balance;">
+                            В преддверии праздника сердечно приглашаем Вас на наш Новогодний вечер.
+                        </span>
                     </p>
                     
                     <div class="relative py-4 my-4 bg-white/5 rounded-lg border border-white/5 shadow-inner">
@@ -253,7 +251,6 @@
             </div>
 
             <div class="bg-black/30 rounded-xl p-6 mb-8 text-left space-y-6 border border-white/10 fade-in-up delay-300 shadow-lg relative z-10">
-                <!-- Info Section -->
                 <div class="flex items-center gap-4">
                     <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <div class="flex-1">
@@ -297,7 +294,6 @@
         </footer>
     </main>
 
-    <!-- Modal 弹窗 -->
     <div id="rsvpModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
         <div class="glass-card w-11/12 max-w-md p-6 rounded-xl transform scale-95 transition-transform duration-300 relative text-left">
             <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
@@ -336,21 +332,7 @@
     </div>
 
     <script>
-    // ★★★ 请在这里填入 LeanCloud 的 Key ★★★
-    const APP_ID = "IMzNgHjwht6N0LGHej9c9Rrb-MdYXbMMI";  // 刚才复制的 App ID
-    const APP_KEY = "bLaVj1wNy2M1VzqnqbqDmi3p"; // 刚才复制的 App Key
-    // serverURL 填: https://你的AppID前8位.api.lncldglobal.com
-    // 例如 AppID 是 "abcdefg...", 则填 "https://abcdefg.api.lncldglobal.com"
-    const SERVER_URL = "https://IMzNgHjw.api.lncldglobal.com"; 
-
-    // 初始化 LeanCloud
-    AV.init({
-        appId: APP_ID,
-        appKey: APP_KEY,
-        serverURLs: SERVER_URL
-    });
-
-    // Modal Logic (保持不变)
+    // 1. 先初始化 UI 逻辑（确保按钮无论如何都能点开）
     const modal = document.getElementById('rsvpModal');
     const openBtn = document.getElementById('openModalBtn');
     const closeBtn = document.getElementById('closeModalBtn');
@@ -359,23 +341,56 @@
 
     const openModal = () => {
         modal.classList.remove('hidden');
-        setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('div').classList.remove('scale-95'); modal.querySelector('div').classList.add('scale-100'); }, 10);
+        setTimeout(() => { 
+            modal.classList.remove('opacity-0'); 
+            modal.querySelector('div').classList.remove('scale-95'); 
+            modal.querySelector('div').classList.add('scale-100'); 
+        }, 10);
     };
+
     const closeModal = () => {
-        modal.classList.add('opacity-0'); modal.querySelector('div').classList.remove('scale-100'); modal.querySelector('div').classList.add('scale-95');
+        modal.classList.add('opacity-0'); 
+        modal.querySelector('div').classList.remove('scale-100'); 
+        modal.querySelector('div').classList.add('scale-95');
         setTimeout(() => { modal.classList.add('hidden'); }, 300);
     };
 
-    openBtn.addEventListener('click', openModal);
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    // 绑定基础事件
+    if(openBtn) openBtn.addEventListener('click', openModal);
+    if(closeBtn) closeBtn.addEventListener('click', closeModal);
+    if(modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    // Handle Submit (修改为 LeanCloud 逻辑)
+    // 2. 再尝试初始化 LeanCloud（容错处理）
+    const APP_ID = "IMzNgHjwht6N0LGHej9c9Rrb-MdYXbMMI";
+    const APP_KEY = "bLaVj1wNy2M1VzqnqbqDmi3p";
+    // 自动补全 Server URL
+    const SERVER_URL = "https://IMzNgHjw.api.lncldglobal.com"; 
+
+    let isLeanCloudReady = false;
+
+    try {
+        if (typeof AV === 'undefined') {
+            console.warn("LeanCloud SDK未加载，可能是网络拦截或文件路径错误");
+        } else {
+            AV.init({
+                appId: APP_ID,
+                appKey: APP_KEY,
+                serverURLs: SERVER_URL
+            });
+            isLeanCloudReady = true;
+            console.log("LeanCloud 初始化成功");
+        }
+    } catch (error) {
+        console.error("LeanCloud 初始化异常:", error);
+    }
+
+    // 3. 处理表单提交
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        if (APP_ID === "你的_App_ID") {
-            alert("请先在代码中填入 LeanCloud 的 App ID 和 Key！");
+        // 如果 SDK 没加载好，拦截提交并提示
+        if (!isLeanCloudReady) {
+            alert("无法连接服务器。请检查网络连接，或尝试刷新页面。\n如问题持续，请直接联系主办方。");
             return;
         }
 
@@ -390,7 +405,6 @@
         submitBtn.innerHTML = "提交中... / Загрузка...";
 
         try {
-            // 定义数据库表名 'RSVP'
             const RSVP = AV.Object.extend('RSVP');
             const rsvp = new RSVP();
             
@@ -410,7 +424,7 @@
                 openBtn.innerHTML = '<span class="font-bold text-lg">已预留席位</span><span class="text-sm ru-font">До встречи!</span>';
                 openBtn.disabled = true;
                 openBtn.style.background = "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)";
-                openBtn.classList.remove('rsvp-btn'); // 移除旧样式以保持绿色
+                openBtn.classList.remove('rsvp-btn');
             }, 1000);
 
         } catch (error) {
