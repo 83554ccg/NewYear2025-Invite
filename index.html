@@ -2,9 +2,11 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>2025俄文系新年晚会邀请函</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
 
@@ -15,28 +17,39 @@
             --deep-blue: #1B315E; 
             --glass-bg: rgba(27, 49, 94, 0.45); 
             --glass-border: rgba(255, 215, 0, 0.2);
-            --input-bg: rgba(0, 0, 0, 0.3);
+            --input-bg: rgba(0, 0, 0, 0.4);
         }
 
+        /* 解决 FOUC (样式闪烁) 问题 */
         body {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
             background-color: var(--deep-blue);
             background-image: 
                 radial-gradient(circle at 50% -20%, rgba(255, 223, 0, 0.15) 0%, transparent 60%),
                 linear-gradient(180deg, #203A6F 0%, #111e38 100%);
             color: white;
             font-family: 'Noto Serif SC', serif;
-            overflow-x: hidden;
             min-height: 100vh;
             margin: 0;
+            /* 移动端防回弹 */
+            overscroll-behavior: none; 
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 氛围光斑 */
+        body.loaded {
+            opacity: 1;
+        }
+
+        /* 氛围光斑 - 增加 will-change 优化性能 */
         .bokeh {
             position: fixed;
             border-radius: 50%;
             filter: blur(80px);
             z-index: 0;
             animation: float 20s infinite ease-in-out;
+            will-change: transform;
+            pointer-events: none; /* 防止遮挡点击 */
         }
         .bokeh:nth-child(1) { width: 300px; height: 300px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%); animation-delay: 0s; }
         .bokeh:nth-child(2) { width: 350px; height: 350px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.04) 0%, transparent 70%); animation-delay: -10s; }
@@ -46,39 +59,25 @@
             50% { transform: translate(10px, -10px); }
         }
 
-        /* 雪花动画 */
+        /* 雪花动画 - 优化 z-index 避免遮挡文字交互 */
         .snowflake {
             color: #fff;
             font-size: 1em;
-            font-family: Arial, sans-serif;
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
             position: fixed;
             top: -10%;
             z-index: 1;
             user-select: none;
-            cursor: default;
+            pointer-events: none;
             animation-name: snowflakes-fall, snowflakes-shake;
             animation-duration: 15s, 5s;
             animation-timing-function: linear, ease-in-out;
-            animation-iteration-count: infinite, infinite;
-            animation-play-state: running, running;
+            animation-iteration-count: infinite;
             opacity: 0.5;
         }
         @keyframes snowflakes-fall { 0% { top: -10%; } 100% { top: 100%; } }
         @keyframes snowflakes-shake { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(80px); } }
-        /* 生成一些雪花 */
-        .snowflake:nth-of-type(0) { left: 1%; animation-delay: 0s, 0s; }
-        .snowflake:nth-of-type(1) { left: 10%; animation-delay: 1s, 1s; }
-        .snowflake:nth-of-type(2) { left: 20%; animation-delay: 6s, .5s; }
-        .snowflake:nth-of-type(3) { left: 30%; animation-delay: 4s, 2s; }
-        .snowflake:nth-of-type(4) { left: 40%; animation-delay: 2s, 2s; }
-        .snowflake:nth-of-type(5) { left: 50%; animation-delay: 8s, 3s; }
-        .snowflake:nth-of-type(6) { left: 60%; animation-delay: 6s, 2s; }
-        .snowflake:nth-of-type(7) { left: 70%; animation-delay: 2.5s, 1s; }
-        .snowflake:nth-of-type(8) { left: 80%; animation-delay: 1s, 0s; }
-        .snowflake:nth-of-type(9) { left: 90%; animation-delay: 3s, 1.5s; }
-
-        /* 升级版玻璃卡片 */
+        
+        /* 玻璃卡片 */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -87,15 +86,14 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
             position: relative;
             overflow: hidden;
+            /* 硬件加速 */
+            transform: translateZ(0);
         }
         
         .glass-card::after {
             content: '';
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
             border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 12px;
             pointer-events: none;
@@ -104,12 +102,9 @@
 
         .corner-decor {
             position: absolute;
-            width: 15px;
-            height: 15px;
+            width: 15px; height: 15px;
             border: 1px solid var(--primary-gold);
-            z-index: 1;
-            opacity: 0.5;
-            transition: opacity 0.3s;
+            z-index: 1; opacity: 0.5;
         }
         .corner-tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; border-radius: 4px 0 0 0; }
         .corner-tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; border-radius: 0 4px 0 0; }
@@ -117,19 +112,16 @@
         .corner-br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; border-radius: 0 0 4px 0; }
 
         .gold-text-shimmer {
+            /* ✅ 优化2：增加回退颜色，防止在不支持 clip 的浏览器上文字消失 */
+            color: #bf953f; 
             background: linear-gradient(
                 to right,
-                #bf953f 0%,
-                #fffacd 20%, 
-                #b38728 40%,
-                #fffacd 60%,
-                #aa771c 80%,
-                #bf953f 100%
+                #bf953f 0%, #fffacd 20%, #b38728 40%, #fffacd 60%, #aa771c 80%, #bf953f 100%
             );
             background-size: 200% auto;
-            color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
+            color: transparent;
             animation: shine 6s linear infinite;
             text-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
         }
@@ -137,6 +129,7 @@
 
         .gold-text { color: var(--primary-gold); }
         .ru-font { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; }
+        
         .ornament-line { display: flex; align-items: center; justify-content: center; margin: 24px 0; }
         .ornament-line::before, .ornament-line::after {
             content: ""; height: 1px; background: linear-gradient(90deg, transparent, var(--primary-gold), transparent); flex: 1; margin: 0 15px; opacity: 0.5;
@@ -150,9 +143,9 @@
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        .rsvp-btn:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
-        .rsvp-btn:disabled { opacity: 0.7; cursor: not-allowed; filter: grayscale(50%); }
-
+        .rsvp-btn:active { transform: scale(0.98); } /* 增加点击反馈 */
+        
+        /* 动画类 */
         .fade-in-up { animation: fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
         .delay-100 { animation-delay: 0.1s; }
         .delay-200 { animation-delay: 0.3s; }
@@ -164,30 +157,53 @@
             animation: drawDome 2s ease-out forwards; filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.4));
         }
         @keyframes drawDome { to { stroke-dashoffset: 0; } }
-        .icon-gold { stroke: var(--primary-gold); width: 28px; height: 28px; min-width: 28px; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)); }
+        .icon-gold { stroke: var(--primary-gold); width: 28px; height: 28px; min-width: 28px; }
 
-        /* Modal specific styles */
-        .modal-overlay { background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px); }
-        .form-input {
-            background: var(--input-bg); border: 1px solid rgba(255, 255, 255, 0.2); color: white; transition: all 0.3s;
+        /* Modal Styles */
+        .modal-overlay { 
+            background-color: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(8px); 
+            z-index: 100;
+            /* 修复iOS上模态框背后的页面可能滚动的问题 */
+            touch-action: none;
         }
-        .form-input:focus { outline: none; border-color: var(--primary-gold); background: rgba(0, 0, 0, 0.5); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        
+        .form-input {
+            background: var(--input-bg); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white; 
+            transition: all 0.3s;
+            /* ✅ 优化3：iOS必须至少16px才不会自动放大 */
+            font-size: 16px; 
+            appearance: none; /* 去除原生样式 */
+            -webkit-appearance: none;
+            border-radius: 8px; /* 统一圆角 */
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-gold); background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
         .form-select option { background-color: #0F172A; color: white; }
+
+        /* 文本换行优化 */
+        .balance-text {
+            text-wrap: balance; /* Chrome/Edge */
+            white-space: normal; /* Fallback */
+        }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4">
+<body class="flex flex-col items-center justify-center min-h-screen overflow-x-hidden">
 
     <div class="bokeh"></div>
     <div class="bokeh"></div>
 
     <div class="snowflakes" aria-hidden="true">
-        <div class="snowflake">❅</div><div class="snowflake">❆</div><div class="snowflake">❅</div>
-        <div class="snowflake">❆</div><div class="snowflake">❅</div><div class="snowflake">❆</div>
-        <div class="snowflake">❅</div><div class="snowflake">❆</div><div class="snowflake">❅</div>
-        <div class="snowflake">❆</div>
+        <div class="snowflake" style="left: 5%; animation-delay: 0s;">❅</div>
+        <div class="snowflake" style="left: 15%; animation-delay: 2s;">❆</div>
+        <div class="snowflake" style="left: 35%; animation-delay: 4s;">❅</div>
+        <div class="snowflake" style="left: 55%; animation-delay: 1s;">❆</div>
+        <div class="snowflake" style="left: 75%; animation-delay: 3s;">❅</div>
+        <div class="snowflake" style="left: 90%; animation-delay: 5s;">❆</div>
     </div>
 
-    <main class="w-full max-w-xl relative z-10 my-10">
+    <main class="w-full max-w-xl relative z-10 my-8 px-4 pb-8">
         <div class="glass-card rounded-xl p-6 md:p-10 text-center fade-in-up">
             <div class="corner-decor corner-tl"></div><div class="corner-decor corner-tr"></div>
             <div class="corner-decor corner-bl"></div><div class="corner-decor corner-br"></div>
@@ -202,7 +218,7 @@
             <h2 class="ru-font text-2xl md:text-3xl text-gray-200 mb-2 tracking-wide fade-in-up delay-100 drop-shadow-md">
                 С Новым годом
             </h2>
-            <h1 class="text-6xl md:text-7xl font-bold gold-text-shimmer mb-2 fade-in-up delay-100" style="font-family: 'Playfair Display', serif;">
+            <h1 class="text-6xl md:text-7xl font-bold gold-text-shimmer mb-2 fade-in-up delay-100" style="font-family: 'Playfair Display', serif; line-height: 1;">
                 2025
             </h1>
             <h3 class="text-xl md:text-2xl font-bold tracking-widest mb-1 fade-in-up delay-200 text-white drop-shadow-sm">
@@ -214,73 +230,72 @@
 
             <div class="ornament-line fade-in-up delay-200"><span class="text-2xl text-[var(--primary-gold)] opacity-80">❅</span></div>
 
-            <div class="space-y-6 text-gray-200 text-sm md:text-base leading-relaxed mb-8 px-2 fade-in-up delay-200 relative z-10">
+            <div class="space-y-6 text-gray-200 text-sm md:text-base leading-relaxed mb-8 px-1 fade-in-up delay-200 relative z-10">
                 <div class="text-center space-y-1">
                     <p class="font-bold">尊敬的老师、亲爱的同学：</p>
                     <p class="ru-font text-sm text-gray-300">Уважаемые преподаватели и студенты!</p>
                 </div>
                 
                 <div class="text-center space-y-4">
-                    <p style="text-wrap: balance; word-break: keep-all;">
+                    <p class="balance-text">
                         辞旧迎新之际，我们诚挚地邀请您拨冗出席2025年俄文系新年晚会。
                         <br>
-                        <span class="ru-font text-sm text-gray-400 block mt-1" style="text-wrap: balance;">
+                        <span class="ru-font text-sm text-gray-400 block mt-1 balance-text">
                             В преддверии праздника сердечно приглашаем Вас на наш Новогодний вечер.
                         </span>
                     </p>
                     
                     <div class="relative py-4 my-4 bg-white/5 rounded-lg border border-white/5 shadow-inner">
                         <span class="absolute -top-3 -left-1 text-5xl text-[var(--primary-gold)] opacity-30 font-serif leading-none">“</span>
-                        <div class="text-center space-y-2 px-2"> <p class="ru-font text-base md:text-lg text-[var(--primary-gold)] italic leading-relaxed drop-shadow-sm" style="text-wrap: balance;">
+                        <div class="text-center space-y-2 px-3"> 
+                            <p class="ru-font text-base md:text-lg text-[var(--primary-gold)] italic leading-relaxed drop-shadow-sm balance-text">
                                 Друзья мои, прекрасен наш союз!<br>Он, как душа, неразделим и вечен.
                             </p>
-        
-                            <p class="text-sm text-gray-300 font-serif" style="text-wrap: balance;">
+                            <p class="text-sm text-gray-300 font-serif balance-text">
                                 朋友们，我们的情谊多么美好！<br>它像灵魂不可分割，于世长存。
                             </p>
-        
-                            <p class="text-xs text-gray-400 mt-2 text-right mr-4">— А.С. Пушкин (普希金)</p>
+                            <p class="text-xs text-gray-400 mt-2 text-right mr-2">— А.С. Пушкин (普希金)</p>
                         </div>
                         <span class="absolute -bottom-6 -right-1 text-5xl text-[var(--primary-gold)] opacity-30 font-serif leading-none">”</span>
                     </div>
 
                     <div class="text-center mt-4">
-                        <p class="text-white opacity-90">愿我们在这不朽的联结中，共赴2025的新约。</p>
-                        <p class="ru-font text-sm text-gray-400 mt-1">Пусть в этом нерушимом союзе мы вместе встретим 2025 год.</p>
+                        <p class="text-white opacity-90 balance-text">愿我们在这不朽的联结中，共赴2025的新约。</p>
+                        <p class="ru-font text-sm text-gray-400 mt-1 balance-text">Пусть в этом нерушимом союзе мы вместе встретим 2025 год.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-black/30 rounded-xl p-6 mb-8 text-left space-y-6 border border-white/10 fade-in-up delay-300 shadow-lg relative z-10">
-                <div class="flex items-center gap-4">
-                    <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <div class="bg-black/30 rounded-xl p-5 mb-8 text-left space-y-5 border border-white/10 fade-in-up delay-300 shadow-lg relative z-10">
+                <div class="flex items-start gap-4">
+                    <svg class="icon-gold mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <div class="flex-1">
-                        <p class="text-sm text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Дата</p>
+                        <p class="text-xs text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Дата</p>
                         <p class="font-bold text-lg leading-tight text-white">2025年12月12日 (周五)</p>
                         <p class="text-sm text-gray-400 ru-font mt-0.5">12 декабря 2025 (Пятница)</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="flex items-start gap-4">
+                    <svg class="icon-gold mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     <div class="flex-1">
-                        <p class="text-sm text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Время</p>
+                        <p class="text-xs text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Время</p>
                         <p class="font-bold text-lg leading-tight text-white">18:00 入场 | 18:30 开始</p>
                         <p class="text-sm text-gray-400 ru-font mt-0.5">Вход с 18:00, начало в 18:30</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <svg class="icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <div class="flex items-start gap-4">
+                    <svg class="icon-gold mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Место</p>
+                        <p class="text-xs text-[var(--primary-gold)] uppercase tracking-wider ru-font mb-0.5">Место</p>
                         <p class="font-bold text-lg leading-tight text-white">复旦大学南区工会 北109 靳以剧场</p>
-                        <p class="text-[11px] sm:text-sm text-gray-400 ru-font mt-0.5 text-left leading-tight break-words">
+                        <p class="text-xs sm:text-sm text-gray-400 ru-font mt-0.5 text-left leading-tight break-words">
                             Южный кампус, Профсоюз, Север 109, Театр Цзинь И
                         </p>
                     </div>
                 </div>
             </div>
 
-            <button id="openModalBtn" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10">
+            <button id="openModalBtn" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10 active:scale-95 transition-transform duration-100">
                 <span class="font-bold text-lg tracking-widest text-[#0A1128]">预留您的席位</span>
                 <span class="text-sm font-normal ru-font text-[#0A1128]/80 group-hover:opacity-100 transition-opacity">Забронировать место</span>
             </button>
@@ -295,36 +310,44 @@
         </footer>
     </main>
 
-    <div id="rsvpModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300">
-        <div class="glass-card w-11/12 max-w-md p-6 rounded-xl transform scale-95 transition-transform duration-300 relative text-left">
-            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+    <div id="rsvpModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-card w-full max-w-md max-h-[90vh] overflow-y-auto p-6 rounded-xl transform scale-95 transition-transform duration-300 relative text-left flex flex-col">
+            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-20">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h3 class="text-2xl font-bold text-[var(--primary-gold)] mb-1">出席确认</h3>
-            <p class="text-xs text-gray-400 ru-font mb-6">Подтверждение участия</p>
             
-            <form id="rsvpForm" class="space-y-4">
+            <div class="mb-4 flex-shrink-0">
+                <h3 class="text-2xl font-bold text-[var(--primary-gold)] mb-1">出席确认</h3>
+                <p class="text-xs text-gray-400 ru-font">Подтверждение участия</p>
+            </div>
+            
+            <form id="rsvpForm" class="space-y-4 overflow-y-auto custom-scrollbar">
                 <div>
-                    <label class="block text-sm text-gray-300 mb-1">姓名 / ФИО <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" required class="form-input w-full px-4 py-2 rounded-lg" placeholder="您的姓名 / Ваше имя">
+                    <label class="block text-sm text-gray-300 mb-1" for="name">姓名 / ФИО <span class="text-red-500">*</span></label>
+                    <input type="text" id="name" required class="form-input w-full px-4 py-3 rounded-lg" placeholder="您的姓名 / Ваше имя">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-300 mb-1">身份 / Статус <span class="text-red-500">*</span></label>
-                    <select id="identity" class="form-input w-full px-4 py-2 rounded-lg form-select">
-                        <option value="student">在校学生 / Студент</option>
-                        <option value="teacher">教师 / Преподаватель</option>
-                        <option value="guest">校友或嘉宾 /Выпускник или Гость</option>
-                    </select>
+                    <label class="block text-sm text-gray-300 mb-1" for="identity">身份 / Статус <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <select id="identity" class="form-input w-full px-4 py-3 rounded-lg form-select appearance-none">
+                            <option value="student">在校学生 / Студент</option>
+                            <option value="teacher">教师 / Преподаватель</option>
+                            <option value="guest">校友或嘉宾 / Выпускник/Гость</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-300 mb-1">微信号或手机 / Контакты <span class="text-red-500">*</span></label>
-                    <input type="text" id="contact" required class="form-input w-full px-4 py-2 rounded-lg" placeholder="">
+                    <label class="block text-sm text-gray-300 mb-1" for="contact">联系方式 / Контакты <span class="text-red-500">*</span></label>
+                    <input type="text" id="contact" required class="form-input w-full px-4 py-3 rounded-lg" placeholder="微信号或手机 / WeChat/Tel">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-300 mb-1">新年寄语 / Пожелания (选填)</label>
-                    <textarea id="wishes" rows="2" class="form-input w-full px-4 py-2 rounded-lg" placeholder="您的寄语... / Ваши пожелания..."></textarea>
+                    <label class="block text-sm text-gray-300 mb-1" for="wishes">新年寄语 / Пожелания (选填)</label>
+                    <textarea id="wishes" rows="2" class="form-input w-full px-4 py-3 rounded-lg" placeholder="您的寄语... / Ваши пожелания..."></textarea>
                 </div>
-                <div class="pt-2">
+                <div class="pt-2 pb-1">
                     <button type="submit" id="submitBtn" class="rsvp-btn w-full py-3 rounded-lg font-bold text-[#0A1128] transition-all">提交 / Отправить</button>
                 </div>
             </form>
@@ -332,45 +355,65 @@
     </div>
 
     <script>
-    // 1. 先初始化 UI 逻辑（确保按钮无论如何都能点开）
+    // 页面加载完成后显示内容，避免闪烁
+    window.addEventListener('load', () => {
+        document.body.classList.add('loaded');
+    });
+
     const modal = document.getElementById('rsvpModal');
     const openBtn = document.getElementById('openModalBtn');
     const closeBtn = document.getElementById('closeModalBtn');
     const form = document.getElementById('rsvpForm');
     const submitBtn = document.getElementById('submitBtn');
+    const body = document.body;
+
+    // 禁用背景滚动
+    const disableScroll = () => body.style.overflow = 'hidden';
+    const enableScroll = () => body.style.overflow = '';
 
     const openModal = () => {
         modal.classList.remove('hidden');
-        setTimeout(() => { 
-            modal.classList.remove('opacity-0'); 
-            modal.querySelector('div').classList.remove('scale-95'); 
-            modal.querySelector('div').classList.add('scale-100'); 
-        }, 10);
+        disableScroll();
+        // 强制重绘
+        requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0');
+            const card = modal.querySelector('.glass-card');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+        });
     };
 
     const closeModal = () => {
-        modal.classList.add('opacity-0'); 
-        modal.querySelector('div').classList.remove('scale-100'); 
-        modal.querySelector('div').classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        modal.classList.add('opacity-0');
+        const card = modal.querySelector('.glass-card');
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            enableScroll();
+        }, 300);
     };
 
-    // 绑定基础事件
     if(openBtn) openBtn.addEventListener('click', openModal);
     if(closeBtn) closeBtn.addEventListener('click', closeModal);
-    if(modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    // 点击背景关闭
+    if(modal) modal.addEventListener('click', (e) => { 
+        if (e.target === modal) closeModal(); 
+    });
 
-    // 2. 再尝试初始化 LeanCloud（容错处理）
+    // LeanCloud 初始化逻辑
     const APP_ID = "IMzNgHjwht6N0LGHej9c9Rrb-MdYXbMMI";
     const APP_KEY = "bLaVj1wNy2M1VzqnqbqDmi3p";
-    // 自动补全 Server URL
+    // ⚠️ 注意：LeanCloud 国际版节点在中国大陆访问可能不稳定。
+    // 如果有条件，建议绑定自定义域名或使用国内节点。
     const SERVER_URL = "https://imznghjw.api.lncldglobal.com"; 
 
     let isLeanCloudReady = false;
 
     try {
         if (typeof AV === 'undefined') {
-            console.warn("LeanCloud SDK未加载，可能是网络拦截或文件路径错误");
+            console.warn("LeanCloud SDK未加载");
         } else {
             AV.init({
                 appId: APP_ID,
@@ -378,19 +421,17 @@
                 serverURLs: SERVER_URL
             });
             isLeanCloudReady = true;
-            console.log("LeanCloud 初始化成功");
+            console.log("LeanCloud Ready");
         }
     } catch (error) {
-        console.error("LeanCloud 初始化异常:", error);
+        console.error("LeanCloud Init Error:", error);
     }
 
-    // 3. 处理表单提交
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // 如果 SDK 没加载好，拦截提交并提示
         if (!isLeanCloudReady) {
-            alert("无法连接服务器。请检查网络连接，或尝试刷新页面。\n如问题持续，请直接联系主办方。");
+            alert("网络连接异常，无法提交。请截图联系主办方。");
             return;
         }
 
@@ -399,16 +440,25 @@
         const contact = document.getElementById('contact').value;
         const wishes = document.getElementById('wishes').value;
 
-        // Loading state
         const originalBtnContent = submitBtn.innerHTML;
         submitBtn.disabled = true;
         submitBtn.innerHTML = "提交中... / Загрузка...";
+        submitBtn.style.opacity = "0.7";
 
         try {
             const RSVP = AV.Object.extend('RSVP');
             const rsvp = new RSVP();
             
-            // 保存数据
+            // 简单的防抖动/重复提交检查
+            const query = new AV.Query('RSVP');
+            query.equalTo('contact', contact);
+            query.equalTo('name', name);
+            const count = await query.count();
+            
+            if (count > 0) {
+                 throw new Error("请勿重复提交 / Вы уже зарегистрированы");
+            }
+
             rsvp.set('name', name);
             rsvp.set('identity', identity);
             rsvp.set('contact', contact);
@@ -416,27 +466,31 @@
             
             await rsvp.save();
 
-            // 成功反馈 - 已修改为哑光古铜金风格，避免突兀的绿色
             submitBtn.innerHTML = "提交成功! / Успешно!";
-            submitBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #AA771C 100%)"; // 沉稳的金色
+            submitBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #AA771C 100%)";
             submitBtn.style.color = "#FFFFFF";
 
             setTimeout(() => {
                 closeModal();
-                // 首页大按钮样式：深金/琥珀色，带金属质感
                 openBtn.innerHTML = '<span class="font-bold text-lg text-white">已预留席位</span><span class="text-sm ru-font text-gray-200">До встречи!</span>';
                 openBtn.disabled = true;
                 openBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #8B6508 100%)";
                 openBtn.style.borderColor = "rgba(255, 215, 0, 0.3)";
-                openBtn.style.boxShadow = "inset 0 2px 10px rgba(0,0,0,0.3)"; 
                 openBtn.classList.remove('rsvp-btn');
-            }, 1000);
+                openBtn.classList.remove('active:scale-95'); // 移除点击效果
+            }, 1200);
 
         } catch (error) {
             console.error("Submission error: ", error);
-            alert("提交失败，请重试。\n错误信息: " + error.message);
+            // 区分是网络错误还是重复提交
+            let errorMsg = "提交失败，请重试。";
+            if (error.message.includes("重复")) {
+                errorMsg = error.message;
+            }
+            alert(errorMsg);
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnContent;
+            submitBtn.style.opacity = "1";
         }
     });
     </script>
