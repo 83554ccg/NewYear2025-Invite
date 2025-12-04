@@ -416,14 +416,19 @@
             
             await rsvp.save();
 
-            // 成功反馈
+            // 成功反馈 - 已修改为哑光古铜金风格，避免突兀的绿色
             submitBtn.innerHTML = "提交成功! / Успешно!";
-            submitBtn.style.background = "#4ade80"; 
+            submitBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #AA771C 100%)"; // 沉稳的金色
+            submitBtn.style.color = "#FFFFFF";
+
             setTimeout(() => {
                 closeModal();
-                openBtn.innerHTML = '<span class="font-bold text-lg">已预留席位</span><span class="text-sm ru-font">До встречи!</span>';
+                // 首页大按钮样式：深金/琥珀色，带金属质感
+                openBtn.innerHTML = '<span class="font-bold text-lg text-white">已预留席位</span><span class="text-sm ru-font text-gray-200">До встречи!</span>';
                 openBtn.disabled = true;
-                openBtn.style.background = "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)";
+                openBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #8B6508 100%)";
+                openBtn.style.borderColor = "rgba(255, 215, 0, 0.3)";
+                openBtn.style.boxShadow = "inset 0 2px 10px rgba(0,0,0,0.3)"; 
                 openBtn.classList.remove('rsvp-btn');
             }, 1000);
 
@@ -437,9 +442,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
