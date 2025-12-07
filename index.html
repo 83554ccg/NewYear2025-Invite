@@ -8,6 +8,7 @@
     <link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         :root {
             --primary-gold: #FFD700;
@@ -15,7 +16,6 @@
             --deep-blue: #1B315E; 
             --glass-bg: rgba(27, 49, 94, 0.45); 
             --glass-border: rgba(255, 215, 0, 0.2);
-            --input-bg: rgba(0, 0, 0, 0.4);
         }
 
         /* 解决 FOUC (样式闪烁) 问题 */
@@ -46,7 +46,7 @@
             z-index: 0;
             animation: float 20s infinite ease-in-out;
             will-change: transform;
-            pointer-events: none; 
+            pointer-events: none;
         }
         .bokeh:nth-child(1) { width: 300px; height: 300px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%); animation-delay: 0s; }
         .bokeh:nth-child(2) { width: 350px; height: 350px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.04) 0%, transparent 70%); animation-delay: -10s; }
@@ -137,9 +137,8 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
-            text-decoration: none; /* 确保作为链接时无下划线 */
+            text-decoration: none; /* 去除下划线 */
         }
-        .rsvp-btn:hover { text-decoration: none; }
         .rsvp-btn:active { transform: scale(0.98); } 
         
         /* 动画类 */
@@ -151,9 +150,46 @@
         
         .icon-gold { stroke: var(--primary-gold); width: 28px; height: 28px; min-width: 28px; }
 
+        /* Modal Styles */
+        .modal-overlay { 
+            background-color: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(8px); 
+            z-index: 100;
+            touch-action: none;
+        }
+        
         .balance-text {
             text-wrap: balance; 
-            white-space: normal;
+            white-space: normal; 
+        }
+
+        /* --- 节目单与详情页样式 --- */
+        .program-item {
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            padding: 1rem 0;
+            transition: background 0.3s ease;
+        }
+        .program-item:last-child {
+            border-bottom: none;
+        }
+        .program-item:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+        /* 自定义滚动条 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(27, 49, 94, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 2px;
+        }
+        
+        /* 演员列表的行高优化 */
+        .performer-list {
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -175,6 +211,10 @@
         <div class="glass-card rounded-xl p-6 md:p-10 text-center fade-in-up">
             <div class="corner-decor corner-tl"></div><div class="corner-decor corner-tr"></div>
             <div class="corner-decor corner-bl"></div><div class="corner-decor corner-br"></div>
+
+            <div class="absolute top-5 right-5 z-20">
+                <img src="club_logo.png" alt="社徽" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-md opacity-90" />
+            </div>
 
             <div class="w-24 h-24 mx-auto mb-4 relative z-10">
                 <img 
@@ -264,26 +304,270 @@
                 </div>
             </div>
 
-            <a href="https://v.wjx.cn/vm/tgRd3Oa.aspx" target="_blank" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10 active:scale-95 transition-transform duration-100 hover:no-underline">
+            <a href="https://v.wjx.cn/vm/tgRd3Oa.aspx" target="_blank" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10 active:scale-95 transition-transform duration-100">
                 <span class="font-bold text-lg tracking-widest text-[#0A1128]">预留您的席位</span>
                 <span class="text-sm font-normal ru-font text-[#0A1128]/80 group-hover:opacity-100 transition-opacity">Забронировать место</span>
             </a>
 
+            <div class="flex gap-4 w-full justify-center mt-5 relative z-10 fade-in-up delay-300">
+                <button onclick="openInfoModal('programModal')" 
+                        class="flex-1 py-3 border border-[#FFD700] rounded-lg text-[#FFD700] 
+                               bg-[rgba(27,49,94,0.3)] backdrop-blur-sm
+                               hover:bg-[#FFD700] hover:text-[#1B315E] 
+                               transition-all duration-300 font-bold tracking-wider text-sm
+                               flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    节目单
+                </button>
+                
+                <button onclick="openInfoModal('locationModal')" 
+                        class="flex-1 py-3 border border-[#FFD700] rounded-lg text-[#FFD700] 
+                               bg-[rgba(27,49,94,0.3)] backdrop-blur-sm
+                               hover:bg-[#FFD700] hover:text-[#1B315E] 
+                               transition-all duration-300 font-bold tracking-wider text-sm
+                               flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    地图指引
+                </button>
+            </div>
         </div>
         
         <footer class="mt-8 text-center text-xs text-gray-500 fade-in-up delay-300 flex flex-col items-center gap-1">
             <p>© 2025 复旦大学白桦俄语社</p>
             <div class="flex items-center justify-center gap-2">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zM12 21v-9" /><path d="M12 12l4-4" /><path d="M12 12l-4-4" /></svg>
                 <p class="ru-font text-xs">Клуб русского языка "Берёзка"</p>
             </div>
         </footer>
     </main>
 
+    <div id="programModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-card w-full max-w-md max-h-[85vh] flex flex-col rounded-xl transform scale-95 transition-transform duration-300 relative">
+            
+            <div class="p-4 border-b border-[#FFD700]/30 bg-[#15264a]/50 flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="text-[#FFD700] text-xl font-bold">节目单</h3>
+                    <p class="text-[10px] text-gray-400 ru-font">Программа Новогоднего Вечера</p>
+                </div>
+                <button onclick="closeInfoModal('programModal')" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                
+                <div class="text-center mb-6 pb-4 border-b border-[#FFD700]/20">
+                    <h4 class="text-[#FFD700] font-bold mb-1">晚会主持人</h4>
+                    <p class="text-[var(--accent-gold)] ru-font font-semibold mb-2">Ведущие вечера</p>
+                    <p class="text-gray-200 text-sm">
+                        Наталья Санникова · 杨茗硕 · 冯勃
+                        <span class="block text-xs text-gray-400 mt-1 ru-font">Имя 1 · Имя 2</span>
+                    </p>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">1. 《在森林里诞生了一棵圣诞树》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«В лесу родилась ёлочка»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：大一学生 / Студенты 1-го курса
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">2. 《纺织姑娘》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«Пряха»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：俄文系教师 俞一星 / Юй Исин (Преподаватель факультета)
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">3. 俄罗斯经典诗歌朗诵（一）</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">Чтение стихотворений (Часть I)</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：大四学生 / Студенты 4-го курса
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">4. 《马儿》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«Конь»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：冯勃 / Яков
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">5. 趣味知识竞猜：信不信由你</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">Викторина «Верю — не верю»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        参与：主持与全场观众 / Ведущие и весь зал
+                    </div>
+                </div>
+                
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">6. 《风向在变》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«Ветер меняет направление»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：大二学生 / Студенты 2-го курса
+                    </div>
+                </div>
+
+                <div class="py-4 flex items-center justify-center opacity-80">
+                    <div class="h-px bg-[#FFD700] w-12"></div>
+                    <div class="mx-3 text-[#FFD700] text-sm font-bold">中场休息 / АНТРАКТ</div>
+                    <div class="h-px bg-[#FFD700] w-12"></div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">7. 俄罗斯喜剧《士兵和军官》片段</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">Сценка из сериала «Солдаты и Офицеры»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：莫斯羽、杨茗硕、李睿洋、陆创辉、韦亦铭、冯勃 / Катерина, Константин, Николай, Станислав, Лев и Яков
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">8. 《无轨电车》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«Троллейбус»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：冯勃 / Яков
+                    </div>
+                </div>
+                
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">9. 俄罗斯经典诗歌朗诵（二）</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">Чтение стихотворений (Часть II)</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：大四学生 / Студенты 4-го курса
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">10. 《两只蝴蝶》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«Две бабочки»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：骆聪逸 / Ло Цунъи
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">11. 幸运抽奖与绕口令挑战</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">Лотерея и конкурс скороговорок</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        主持与观众 / Ведущие и зрители
+                    </div>
+                </div>
+
+                <div class="program-item">
+                    <div class="text-[#FFD700] font-bold">12. 《最美好的前途》</div>
+                    <div class="text-sm text-[var(--accent-gold)] ru-font font-semibold">«Прекрасное далёко»</div>
+                    <div class="text-xs text-gray-300 mt-1 pl-2 border-l-2 border-[#FFD700]/30 performer-list">
+                        表演：冯勃、陈思巍 / Яков и Анатолий
+                    </div>
+                </div>
+                
+                <p class="text-[10px] text-center text-gray-500 mt-4">* 节目内容以现场为准 / В программе возможны изменения</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="locationModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-card w-full max-w-sm rounded-xl transform scale-95 transition-transform duration-300 relative p-6">
+            <button onclick="closeInfoModal('locationModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h3 class="text-[#FFD700] text-xl font-bold text-center mb-6">场地指引 <span class="block text-sm font-normal ru-font mt-1">Место проведения</span></h3>
+            
+            <div class="space-y-6 text-gray-200">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🕒</span>
+                    <div>
+                        <div class="text-[#FFD700] font-bold">时间 / Время</div>
+                        <div>2025年12月12日 (周五)</div>
+                        <div>18:00 入场 | 18:30 开始</div>
+                        <div class="text-xs text-gray-400">12 декабря 2025</div>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">📍</span>
+                    <div>
+                        <div class="text-[#FFD700] font-bold">地点 / Адрес</div>
+                        <div>复旦大学南区工会 北109 靳以剧场</div> 
+                        <div class="text-xs text-gray-400">Южный кампус, Профсоюз, Север 109, Театр Цзинь И</div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-[#FFD700]/30 text-center space-y-3">
+                    <div class="text-[#FFD700] font-bold text-sm">如何到达 / Как добраться</div>
+                    <p class="text-gray-200 leading-relaxed text-sm">
+                        复旦大学南区工会楼坐落于教工食堂东侧。<br>步入正门后，右前方即为109靳以剧场。
+                    </p>
+                    <p class="text-gray-400 ru-font text-xs leading-relaxed">
+                        Здание профсоюза расположено к востоку от столовой преподавателей. Театр (комната 109) находится справа от входа.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-    // 仅保留页面加载动画逻辑
+    // 页面加载完成后显示内容
     window.addEventListener('load', () => {
         document.body.classList.add('loaded');
+    });
+
+    const body = document.body;
+
+    const disableScroll = () => body.style.overflow = 'hidden';
+    const enableScroll = () => body.style.overflow = '';
+
+    // 通用信息弹窗逻辑
+    window.openInfoModal = (modalId) => {
+        const infoModal = document.getElementById(modalId);
+        if (infoModal) {
+            infoModal.classList.remove('hidden');
+            disableScroll();
+            requestAnimationFrame(() => {
+                infoModal.classList.remove('opacity-0');
+                const card = infoModal.querySelector('.glass-card');
+                if(card) {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }
+            });
+        }
+    };
+
+    window.closeInfoModal = (modalId) => {
+        const infoModal = document.getElementById(modalId);
+        if (infoModal) {
+            infoModal.classList.add('opacity-0');
+            const card = infoModal.querySelector('.glass-card');
+            if(card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                infoModal.classList.add('hidden');
+                enableScroll();
+            }, 300);
+        }
+    };
+    
+    ['programModal', 'locationModal'].forEach(id => {
+        const m = document.getElementById(id);
+        if(m) {
+            m.addEventListener('click', (e) => {
+                if(e.target === m) window.closeInfoModal(id);
+            });
+        }
     });
     </script>
 </body>
