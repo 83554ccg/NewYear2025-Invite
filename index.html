@@ -8,8 +8,6 @@
     <link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
-
     <style>
         :root {
             --primary-gold: #FFD700;
@@ -32,7 +30,6 @@
             font-family: 'Noto Serif SC', serif;
             min-height: 100vh;
             margin: 0;
-            /* 移动端防回弹 */
             overscroll-behavior: none; 
             -webkit-tap-highlight-color: transparent;
         }
@@ -41,7 +38,7 @@
             opacity: 1;
         }
 
-        /* 氛围光斑 - 增加 will-change 优化性能 */
+        /* 氛围光斑 */
         .bokeh {
             position: fixed;
             border-radius: 50%;
@@ -49,7 +46,7 @@
             z-index: 0;
             animation: float 20s infinite ease-in-out;
             will-change: transform;
-            pointer-events: none; /* 防止遮挡点击 */
+            pointer-events: none; 
         }
         .bokeh:nth-child(1) { width: 300px; height: 300px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%); animation-delay: 0s; }
         .bokeh:nth-child(2) { width: 350px; height: 350px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(255, 215, 0, 0.04) 0%, transparent 70%); animation-delay: -10s; }
@@ -59,7 +56,7 @@
             50% { transform: translate(10px, -10px); }
         }
 
-        /* 雪花动画 - 优化 z-index 避免遮挡文字交互 */
+        /* 雪花动画 */
         .snowflake {
             color: #fff;
             font-size: 1em;
@@ -86,7 +83,6 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
             position: relative;
             overflow: hidden;
-            /* 硬件加速 */
             transform: translateZ(0);
         }
         
@@ -112,7 +108,6 @@
         .corner-br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; border-radius: 0 0 4px 0; }
 
         .gold-text-shimmer {
-            /* ✅ 优化2：增加回退颜色，防止在不支持 clip 的浏览器上文字消失 */
             color: #bf953f; 
             background: linear-gradient(
                 to right,
@@ -142,8 +137,10 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
+            text-decoration: none; /* 确保作为链接时无下划线 */
         }
-        .rsvp-btn:active { transform: scale(0.98); } /* 增加点击反馈 */
+        .rsvp-btn:hover { text-decoration: none; }
+        .rsvp-btn:active { transform: scale(0.98); } 
         
         /* 动画类 */
         .fade-in-up { animation: fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
@@ -152,40 +149,11 @@
         .delay-300 { animation-delay: 0.5s; }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
         
-        .dome-icon {
-            fill: none; stroke: var(--primary-gold); stroke-width: 1.5; stroke-dasharray: 300; stroke-dashoffset: 300;
-            animation: drawDome 2s ease-out forwards; filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.4));
-        }
-        @keyframes drawDome { to { stroke-dashoffset: 0; } }
         .icon-gold { stroke: var(--primary-gold); width: 28px; height: 28px; min-width: 28px; }
 
-        /* Modal Styles */
-        .modal-overlay { 
-            background-color: rgba(0, 0, 0, 0.85); 
-            backdrop-filter: blur(8px); 
-            z-index: 100;
-            /* 修复iOS上模态框背后的页面可能滚动的问题 */
-            touch-action: none;
-        }
-        
-        .form-input {
-            background: var(--input-bg); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            color: white; 
-            transition: all 0.3s;
-            /* ✅ 优化3：iOS必须至少16px才不会自动放大 */
-            font-size: 16px; 
-            appearance: none; /* 去除原生样式 */
-            -webkit-appearance: none;
-            border-radius: 8px; /* 统一圆角 */
-        }
-        .form-input:focus { outline: none; border-color: var(--primary-gold); background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-        .form-select option { background-color: #0F172A; color: white; }
-
-        /* 文本换行优化 */
         .balance-text {
-            text-wrap: balance; /* Chrome/Edge */
-            white-space: normal; /* Fallback */
+            text-wrap: balance; 
+            white-space: normal;
         }
     </style>
 </head>
@@ -296,10 +264,11 @@
                 </div>
             </div>
 
-            <button id="openModalBtn" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10 active:scale-95 transition-transform duration-100">
+            <a href="https://v.wjx.cn/vm/tgRd3Oa.aspx" target="_blank" class="rsvp-btn w-full py-4 rounded-lg flex flex-col items-center justify-center gap-1 fade-in-up delay-300 cursor-pointer shadow-lg group relative z-10 active:scale-95 transition-transform duration-100 hover:no-underline">
                 <span class="font-bold text-lg tracking-widest text-[#0A1128]">预留您的席位</span>
                 <span class="text-sm font-normal ru-font text-[#0A1128]/80 group-hover:opacity-100 transition-opacity">Забронировать место</span>
-            </button>
+            </a>
+
         </div>
         
         <footer class="mt-8 text-center text-xs text-gray-500 fade-in-up delay-300 flex flex-col items-center gap-1">
@@ -311,190 +280,11 @@
         </footer>
     </main>
 
-    <div id="rsvpModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-overlay opacity-0 transition-opacity duration-300 p-4">
-        <div class="glass-card w-full max-w-md max-h-[90vh] overflow-y-auto p-6 rounded-xl transform scale-95 transition-transform duration-300 relative text-left flex flex-col">
-            <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-20">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            
-            <div class="mb-4 flex-shrink-0">
-                <h3 class="text-2xl font-bold text-[var(--primary-gold)] mb-1">出席确认</h3>
-                <p class="text-xs text-gray-400 ru-font">Подтверждение участия</p>
-            </div>
-            
-            <form id="rsvpForm" class="space-y-4 overflow-y-auto custom-scrollbar">
-                <div>
-                    <label class="block text-sm text-gray-300 mb-1" for="name">姓名 / ФИО <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" required class="form-input w-full px-4 py-3 rounded-lg" placeholder="您的姓名 / Ваше имя">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-300 mb-1" for="identity">身份 / Статус <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <select id="identity" class="form-input w-full px-4 py-3 rounded-lg form-select appearance-none">
-                            <option value="student">在校学生 / Студент</option>
-                            <option value="teacher">教师 / Преподаватель</option>
-                            <option value="guest">校友或嘉宾 / Выпускник/Гость</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400">
-                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-300 mb-1" for="contact">联系方式 / Контакты <span class="text-red-500">*</span></label>
-                    <input type="text" id="contact" required class="form-input w-full px-4 py-3 rounded-lg" placeholder="微信号或手机 / WeChat/Tel">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-300 mb-1" for="wishes">新年寄语 / Пожелания (选填)</label>
-                    <textarea id="wishes" rows="2" class="form-input w-full px-4 py-3 rounded-lg" placeholder="您的寄语... / Ваши пожелания..."></textarea>
-                </div>
-                <div class="pt-2 pb-1">
-                    <button type="submit" id="submitBtn" class="rsvp-btn w-full py-3 rounded-lg font-bold text-[#0A1128] transition-all">提交 / Отправить</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
-    // 页面加载完成后显示内容，避免闪烁
+    // 仅保留页面加载动画逻辑
     window.addEventListener('load', () => {
         document.body.classList.add('loaded');
-    });
-
-    const modal = document.getElementById('rsvpModal');
-    const openBtn = document.getElementById('openModalBtn');
-    const closeBtn = document.getElementById('closeModalBtn');
-    const form = document.getElementById('rsvpForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const body = document.body;
-
-    // 禁用背景滚动
-    const disableScroll = () => body.style.overflow = 'hidden';
-    const enableScroll = () => body.style.overflow = '';
-
-    const openModal = () => {
-        modal.classList.remove('hidden');
-        disableScroll();
-        // 强制重绘
-        requestAnimationFrame(() => {
-            modal.classList.remove('opacity-0');
-            const card = modal.querySelector('.glass-card');
-            card.classList.remove('scale-95');
-            card.classList.add('scale-100');
-        });
-    };
-
-    const closeModal = () => {
-        modal.classList.add('opacity-0');
-        const card = modal.querySelector('.glass-card');
-        card.classList.remove('scale-100');
-        card.classList.add('scale-95');
-        
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            enableScroll();
-        }, 300);
-    };
-
-    if(openBtn) openBtn.addEventListener('click', openModal);
-    if(closeBtn) closeBtn.addEventListener('click', closeModal);
-    // 点击背景关闭
-    if(modal) modal.addEventListener('click', (e) => { 
-        if (e.target === modal) closeModal(); 
-    });
-
-    // LeanCloud 初始化逻辑
-    const APP_ID = "IMzNgHjwht6N0LGHej9c9Rrb-MdYXbMMI";
-    const APP_KEY = "bLaVj1wNy2M1VzqnqbqDmi3p";
-    // ⚠️ 注意：LeanCloud 国际版节点在中国大陆访问可能不稳定。
-    // 如果有条件，建议绑定自定义域名或使用国内节点。
-    const SERVER_URL = "https://imznghjw.api.lncldglobal.com"; 
-
-    let isLeanCloudReady = false;
-
-    try {
-        if (typeof AV === 'undefined') {
-            console.warn("LeanCloud SDK未加载");
-        } else {
-            AV.init({
-                appId: APP_ID,
-                appKey: APP_KEY,
-                serverURLs: SERVER_URL
-            });
-            isLeanCloudReady = true;
-            console.log("LeanCloud Ready");
-        }
-    } catch (error) {
-        console.error("LeanCloud Init Error:", error);
-    }
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (!isLeanCloudReady) {
-            alert("网络连接异常，无法提交。请截图联系主办方。");
-            return;
-        }
-
-        const name = document.getElementById('name').value;
-        const identity = document.getElementById('identity').value;
-        const contact = document.getElementById('contact').value;
-        const wishes = document.getElementById('wishes').value;
-
-        const originalBtnContent = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "提交中... / Загрузка...";
-        submitBtn.style.opacity = "0.7";
-
-        try {
-            const RSVP = AV.Object.extend('RSVP');
-            const rsvp = new RSVP();
-            
-            // 简单的防抖动/重复提交检查
-            const query = new AV.Query('RSVP');
-            query.equalTo('contact', contact);
-            query.equalTo('name', name);
-            const count = await query.count();
-            
-            if (count > 0) {
-                 throw new Error("请勿重复提交 / Вы уже зарегистрированы");
-            }
-
-            rsvp.set('name', name);
-            rsvp.set('identity', identity);
-            rsvp.set('contact', contact);
-            rsvp.set('wishes', wishes);
-            
-            await rsvp.save();
-
-            submitBtn.innerHTML = "提交成功! / Успешно!";
-            submitBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #AA771C 100%)";
-            submitBtn.style.color = "#FFFFFF";
-
-            setTimeout(() => {
-                closeModal();
-                openBtn.innerHTML = '<span class="font-bold text-lg text-white">已预留席位</span><span class="text-sm ru-font text-gray-200">До встречи!</span>';
-                openBtn.disabled = true;
-                openBtn.style.background = "linear-gradient(135deg, #B8860B 0%, #8B6508 100%)";
-                openBtn.style.borderColor = "rgba(255, 215, 0, 0.3)";
-                openBtn.classList.remove('rsvp-btn');
-                openBtn.classList.remove('active:scale-95'); // 移除点击效果
-            }, 1200);
-
-        } catch (error) {
-            console.error("Submission error: ", error);
-            // 区分是网络错误还是重复提交
-            let errorMsg = "提交失败，请重试。";
-            if (error.message.includes("重复")) {
-                errorMsg = error.message;
-            }
-            alert(errorMsg);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnContent;
-            submitBtn.style.opacity = "1";
-        }
     });
     </script>
 </body>
 </html>
-
